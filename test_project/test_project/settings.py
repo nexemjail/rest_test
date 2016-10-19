@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'test_app',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +101,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

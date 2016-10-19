@@ -1,8 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-home_path = "~/py/test_vagrant"
-vm_path = "/home/vagrant/dj/test_vagrant"
+home_path = "~/py/rest_test"
+vm_path = "/home/vagrant/dj/rest_test"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for

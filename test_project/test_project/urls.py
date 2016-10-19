@@ -15,11 +15,11 @@ Including another URLconf
 """
 
 
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.contrib import admin
-from test_app import views
+from rest_framework import urls as rest_urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'v', views.v)
+    url(r'^api/', include(rest_urls, namespace='rest_framework'))
 ]
