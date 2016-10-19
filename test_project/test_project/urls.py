@@ -17,9 +17,9 @@ Including another URLconf
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from rest_framework import urls as rest_urls
+from api import urls as api_urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(rest_urls, namespace='rest_framework'))
+    url(r'^', include(api_urls))
 ]
