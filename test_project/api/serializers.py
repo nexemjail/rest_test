@@ -1,11 +1,20 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.serializers import CharField, ValidationError
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+            'email',
+        )
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password = CharField(required=True, label='Enter password')
-    password2 = CharField(required=True, label='Confirm password')
+    password = serializers.CharField(required=True, label='Enter password')
+    password2 = serializers.CharField(required=True, label='Confirm password')
 
     class Meta:
         model = User
@@ -15,15 +24,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'password',
             'password2',
         )
-        extra_kwargs = {'password':
-                            {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}}
 
+    # cause fields are validated in order
     def validate_password2(self, value):
         data = self.get_initial()
         pass1 = data.get('password')
         pass2 = value
         if pass1 != pass2:
-            raise ValidationError('Passwords must match!')
+            raise serializers.ValidationError('Passwords must match!')
         return pass2
 
     def create(self, validated_data):
@@ -40,7 +49,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
-    username = CharField()
+    username = serializers.CharField()
 
     class Meta:
         model = User
