@@ -19,15 +19,15 @@ class UserDetailAPIView(generics.RetrieveAPIView):
     serializer_class = UserListSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, id, *args, **kwargs):
         print args, kwargs
-        user_id = kwargs.get('id', None)
+        user_id = int(id)
         if user_id:
-            user = User.objects.filter(id=int(user_id))
+            user = User.objects.filter(id=user_id)
             if user.exists():
                 return response.Response(UserListSerializer(user.get()).data, status=status.HTTP_200_OK)
-            return response.Response(status=status.HTTP_204_NO_CONTENT)
-        return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(data={'error': 'no user'}, status=status.HTTP_404_NOT_FOUND)
+        return response.Response({'error': 'invalid format'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserListAPIView(generics.ListAPIView):
@@ -49,7 +49,7 @@ class UserLoginAPIView(views.APIView):
                                 password=data['password'])
             if user:
                 login(request, user)
-                return response.Response(serializer.data, status.HTTP_200_OK)
+                return response.Response(data={'status': 'login successful'}, status=status.HTTP_200_OK)
         return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -58,7 +58,7 @@ class UserLogoutAPIView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        return response.Response(status=status.HTTP_200_OK)
+        return response.Response(data={'status': 'log out successful'}, status=status.HTTP_200_OK)
 
 
 class UserCreateAPIView(generics.CreateAPIView):
