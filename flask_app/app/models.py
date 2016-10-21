@@ -12,9 +12,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.Boolean, default=USER_ROLE)
 
     def __repr__(self):
-        return '{} {} is_admin: {}'.format(self.id, self.username, self.role)
+        return '{}: {}'.format(self.id, self.username)
 
-
-class Session(db.Model):
-    id = db.Column(db.String(250), primary_key=True)
-    user = db.ForeignKey('user.id')
+    def __str__(self):
+        return self.__repr__()
