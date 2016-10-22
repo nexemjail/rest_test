@@ -15,7 +15,6 @@ class ResponseCodes(object):
     SERVER_ERROR_500 = 500
 
 
-
 class Logout(Resource):
     @flask_login.login_required
     def get(self):
@@ -29,7 +28,7 @@ class Login(Resource):
         password = request.form.get('password', None)
 
         if not username or not password:
-            return {'error': 'invalid data format'}
+            return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
         else:
             user = User.query.filter_by(username=username, password=password).first()
             if not user:
@@ -56,6 +55,7 @@ class Register(Resource):
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
+
         return {'message': 'user successfully created'}, ResponseCodes.OK
 
 

@@ -18,6 +18,6 @@ api_patterns = [
 
 urlpatterns = [
 
-    url(r'^user/', include(api_patterns)),
+    url(r'^', include(api_patterns)),
     url(r'^auth/', include(urls, namespace='rest_framework')),
 ]
