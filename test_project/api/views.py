@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
+from django.shortcuts import get_object_or_404
 from rest_framework import (
     permissions,
     generics,
@@ -15,18 +16,11 @@ from serializers import (
 
 
 class UserDetailAPIView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
     serializer_class = UserListSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get(self, request, id, *args, **kwargs):
-        user_id = int(id)
-        if user_id:
-            user = User.objects.filter(id=user_id)
-            if user.exists():
-                return response.Response(UserListSerializer(user.get()).data, status=status.HTTP_200_OK)
-            return response.Response(data={'detail': 'no such user'}, status=status.HTTP_404_NOT_FOUND)
-        return response.Response({'detail': 'invalid format'}, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        return User.objects.get(pk=int(self.kwargs['id']))
 
 
 class UserListAPIView(generics.ListAPIView):
@@ -37,7 +31,6 @@ class UserListAPIView(generics.ListAPIView):
 
 class UserLoginAPIView(views.APIView):
     serializer_class = UserLoginSerializer
-    queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -48,7 +41,7 @@ class UserLoginAPIView(views.APIView):
                                 password=data['password'])
             if user:
                 login(request, user)
-                return response.Response(data={'detail': 'login successful'}, status=status.HTTP_200_OK)
+                return response.Response({'detail': 'login successful'}, status.HTTP_200_OK)
         return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -57,7 +50,7 @@ class UserLogoutAPIView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        return response.Response(data={'detail': 'log out successful'}, status=status.HTTP_200_OK)
+        return response.Response({'detail': 'log out successful'}, status.HTTP_200_OK)
 
 
 class UserCreateAPIView(generics.CreateAPIView):

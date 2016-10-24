@@ -1,5 +1,5 @@
 from app import login_manager, db, api
-from flask_restful import Resource
+from flask_restful import Resource, marshal_with
 from flask import request, session
 import flask_login
 from models import User
@@ -19,7 +19,7 @@ class Login(Resource):
         username = request.form.get('username', None)
         password = request.form.get('password', None)
 
-        if not username or not password:
+        if username is None or password is None:
             return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
         else:
             user = User.query.filter_by(username=username, password=password).first()
@@ -40,8 +40,8 @@ class Register(Resource):
         if not username or not password:
             return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
 
-        q = User.query.filter_by(username=username).count()
-        if q > 0:
+        users_found = User.query.filter_by(username=username).count()
+        if users_found > 0:
             return {'error': 'user already exists'}, ResponseCodes.BAD_REQUEST_400
 
         user = User(username=username, password=password)
@@ -58,10 +58,13 @@ def load_user(user_id):
 
 class UserList(Resource):
     @flask_login.login_required
-    def get(self):
-        return {'users': map(lambda x: x.username, User.query.all())}, ResponseCodes.OK
+    def get(self, id=None):
+        if id:
+            user = User.query.filter_by(id=id).first_or_404()
+            return {'user': str(user)}, ResponseCodes.OK
+        return {'users': map(str, User.query.all())}, ResponseCodes.OK
 
 api.add_resource(Register, '/register')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
-api.add_resource(UserList, '/')
+api.add_resource(UserList, '/', '/<int:id>')

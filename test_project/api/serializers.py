@@ -13,8 +13,8 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(required=True, label='Enter password')
-    password2 = serializers.CharField(required=True, label='Confirm password')
+    password2 = serializers.CharField(required=True, label='Enter password')
+    password = serializers.CharField(required=True, label='Confirm password')
 
     class Meta:
         model = User
