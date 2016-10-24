@@ -26,7 +26,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {'password': {'write_only': True}}
 
-    # cause fields are validated in order
+    # cause fields are validated in order listed in fields
     def validate_password2(self, value):
         data = self.get_initial()
         pass1 = data.get('password')

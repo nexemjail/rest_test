@@ -1,24 +1,16 @@
-from app import app, login_manager, db, api
-from flask_restful import Resource, Api
-from flask import request, Blueprint, session
-from models import User
+from app import login_manager, db, api
+from flask_restful import Resource
+from flask import request, session
 import flask_login
-
-
-class ResponseCodes(object):
-    OK = 200
-    REDIRECT = 300
-    BAD_REQUEST_400 = 400
-    UNAUTHORIZED_401 = 401
-    FORBIDDEN_403 = 403
-    NOT_FOUND_404 = 404
-    SERVER_ERROR_500 = 500
+from models import User
+from utils import ResponseCodes
 
 
 class Logout(Resource):
     @flask_login.login_required
     def get(self):
         flask_login.logout_user()
+        session.update()
         return {'message': 'you are logged out'}, ResponseCodes.OK
 
 
