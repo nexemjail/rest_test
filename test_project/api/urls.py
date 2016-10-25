@@ -1,10 +1,10 @@
 from django.conf.urls import url, include
 from rest_framework import urls
+from rest_framework.authtoken.views import obtain_auth_token
 from views import (
     UserCreateAPIView,
     UserLoginAPIView,
     UserLogoutAPIView,
-    UserListAPIView,
     UserDetailAPIView,
 )
 
@@ -13,11 +13,10 @@ api_patterns = [
     url(r'^login/$', UserLoginAPIView.as_view(), name='login'),
     url(r'^register/$', UserCreateAPIView.as_view(), name='register'),
     url(r'^logout/$', UserLogoutAPIView.as_view(), name='logout'),
-    url(r'^$', UserListAPIView.as_view())
 ]
 
 urlpatterns = [
-
+    url(r'^api-token/$', obtain_auth_token),
     url(r'^', include(api_patterns)),
-    url(r'^auth/', include(urls, namespace='rest_framework')),
+    # url(r'^auth/', include(urls, namespace='rest_framework')),
 ]

@@ -101,13 +101,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+)
+
+
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES':
-        ('rest_framework.permissions.IsAdminUser',),
-    'PAGE_SIZE': 7,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
 
-
-
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
 }
 
 # Internationalization

@@ -1,55 +1,63 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 
-class UserListSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
             'id',
-            'username',
             'email',
+            'username',
+            'first_name',
+            'last_name'
         )
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(required=True, label='Enter password')
-    password = serializers.CharField(required=True, label='Confirm password')
+    password = serializers.CharField(required=True, label='Enter password')
+    password2 = serializers.CharField(required=True, label='Confirm password')
 
     class Meta:
         model = User
         fields = (
-            'username',
             'email',
+            'username',
+            'first_name',
+            'last_name',
             'password',
-            'password2',
+            'password2'
         )
-        extra_kwargs = {'password': {'write_only': True}}
 
-    # cause fields are validated in order listed in fields
-    def validate_password2(self, value):
-        data = self.get_initial()
-        pass1 = data.get('password')
-        pass2 = value
-        if pass1 != pass2:
-            raise serializers.ValidationError('Passwords must match!')
-        return pass2
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise validators.ValidationError('Passwords must match')
+        # TODO : check if it is correct ot do queries in validate!
+        # if User.objects.filter(username=attrs['username']).exists():
+        #     raise validators.ValidationError('User already exists')
+        return attrs
 
+    # override create cause of extra unnecessary fields
+    # or just return necessary from validate method? ( bad idea)
     def create(self, validated_data):
-        username = validated_data['username']
         password = validated_data['password']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
         email = validated_data['email']
-        user = User(
-            username=username,
-            email=email
-        )
-        user.set_password(password)
-        user.save()
-        return validated_data
+        username = validated_data['username']
+
+        # or User.objects.create_user()
+        # user = User(username=username, email=email,
+        #             first_name=first_name, last_name=last_name)
+        # user.set_password(password)
+        # user.save()
+        return User.objects.create_user(username=username, email=email,
+                                        first_name=first_name, last_name=last_name,
+                                        password=password)
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
+    username = serializers.CharField(required=True, label='Username')
 
     class Meta:
         model = User
@@ -57,7 +65,3 @@ class UserLoginSerializer(serializers.ModelSerializer):
             'username',
             'password'
         ]
-
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
