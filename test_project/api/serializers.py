@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'username',
             'first_name',
-            'last_name'
+            'last_name',
         )
 
 
@@ -46,11 +46,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         email = validated_data['email']
         username = validated_data['username']
 
-        # or User.objects.create_user()
-        # user = User(username=username, email=email,
-        #             first_name=first_name, last_name=last_name)
-        # user.set_password(password)
-        # user.save()
         return User.objects.create_user(username=username, email=email,
                                         first_name=first_name, last_name=last_name,
                                         password=password)

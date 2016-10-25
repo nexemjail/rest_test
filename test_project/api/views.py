@@ -34,8 +34,8 @@ class UserLoginAPIView(views.APIView):
                                 password=request.data['password'])
             if user:
                 login(request, user)
-                return response.Response({'datail': 'login successful'}, status.HTTP_200_OK)
-            return response.Response({'datail': 'user not exist or invalid credentials'}, status.HTTP_401_UNAUTHORIZED)
+                return response.Response({'detail': 'login successful'}, status.HTTP_200_OK)
+            return response.Response({'detail': 'user not exist or invalid credentials'}, status.HTTP_401_UNAUTHORIZED)
         return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -44,7 +44,8 @@ class UserLogoutAPIView(generics.RetrieveAPIView):
 
     def get(self, request):
         logout(request)
-        return response.Response({'datail': 'log out was successful'}, status.HTTP_200_OK)
+        return response.Response({'detail': 'log out was successful'}, status.HTTP_200_OK)
+
 
 class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
@@ -54,8 +55,8 @@ class UserCreateAPIView(generics.CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             if User.objects.filter(username=serializer.validated_data['username']).exists():
-                return response.Response({'datail': 'user already exists'}, status.HTTP_409_CONFLICT)
+                return response.Response({'detail': 'user already exists'}, status.HTTP_409_CONFLICT)
             self.perform_create(serializer)
-            return response.Response({'datail': 'user created'}, status.HTTP_201_CREATED)
-        return response.Response({'datail': 'invalid data format'}, status.HTTP_400_BAD_REQUEST)
+            return response.Response({'detail': 'user created'}, status.HTTP_201_CREATED)
+        return response.Response({'detail': 'invalid data format'}, status.HTTP_400_BAD_REQUEST)
 

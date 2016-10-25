@@ -6,6 +6,10 @@ from models import User
 from utils import ResponseCodes
 
 
+class ValidationError(Exception):
+    pass
+
+
 class Logout(Resource):
     @flask_login.login_required
     def get(self):
@@ -14,16 +18,23 @@ class Logout(Resource):
         return {'message': 'you are logged out'}, ResponseCodes.OK
 
 
+def is_valid(data):
+    username = data.get('username', None)
+    password = data.get('password', None)
+
+    if username is None or password is None:
+        return True
+    return True
+
+
 class Login(Resource):
     def post(self):
         data = request.get_json()
-        username = data.get('username', None)
-        password = data.get('password', None)
-
-        if username is None or password is None:
+        if not is_valid(data):
             return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
         else:
-            user = User.query.filter_by(username=username, password=password).first()
+            user = User.query.filter_by(username=data['username'],
+                                        password=data['password']).first()
             if not user:
                 return {'error': 'invalid credentials'}, ResponseCodes.BAD_REQUEST_400
 
@@ -36,17 +47,15 @@ class Login(Resource):
 class Register(Resource):
     def post(self):
         data = request.get_json()
-        username = data.get('username', None)
-        password = data.get('password', None)
-
-        if not username or not password:
+        if not is_valid(data):
             return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
 
-        users_found = User.query.filter_by(username=username).count()
+        users_found = User.query.filter_by(username=data['username']).count()
         if users_found > 0:
             return {'error': 'user already exists'}, ResponseCodes.BAD_REQUEST_400
 
-        user = User(username=username, password=password)
+        user = User(username=data['username'],
+                    password=data['password'])
         db.session.add(user)
         db.session.commit()
 
