@@ -1,13 +1,9 @@
 from app import login_manager, db, api
-from flask_restful import Resource, marshal_with
+from flask_restful import Resource, reqparse
 from flask import request, session
 import flask_login
 from models import User
 from utils import ResponseCodes
-
-
-class ValidationError(Exception):
-    pass
 
 
 class Logout(Resource):
@@ -15,40 +11,44 @@ class Logout(Resource):
     def get(self):
         flask_login.logout_user()
         session.update()
-        return {'message': 'you are logged out'}, ResponseCodes.OK
+        return {'detail': 'you are logged out'}, ResponseCodes.OK
 
 
-def is_valid(data):
-    username = data.get('username', None)
-    password = data.get('password', None)
-
-    if username is None or password is None:
-        return True
-    return True
+def _construct_reqparse():
+    parser = reqparse.RequestParser()
+    parser.add_argument('username', type=str, required=True,
+                        location='json', help='Username not provided')
+    parser.add_argument('password', type=str, required=True,
+                        location='json', help='Password not provided')
+    return parser
 
 
 class Login(Resource):
+    def __init__(self):
+        self.reqparse = _construct_reqparse()
+        super(Login, self).__init__()
+
     def post(self):
-        data = request.get_json()
-        if not is_valid(data):
-            return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
-        else:
-            user = User.query.filter_by(username=data['username'],
-                                        password=data['password']).first()
-            if not user:
-                return {'error': 'invalid credentials'}, ResponseCodes.BAD_REQUEST_400
+        data = self.reqparse.parse_args()
 
-            if not flask_login.login_user(user):
-                return {'error': 'error while logging in'}, ResponseCodes.SERVER_ERROR_500
+        user = User.query.filter_by(username=data['username'],
+                                    password=data['password']).first()
+        if not user:
+            return {'error': 'invalid credentials'}, ResponseCodes.BAD_REQUEST_400
 
-            return {'message': 'you are logged in!'}, ResponseCodes.OK
+        if not flask_login.login_user(user):
+            return {'error': 'error while logging in'}, ResponseCodes.SERVER_ERROR_500
+
+        return {'detail': 'you are logged in!'}, ResponseCodes.OK
 
 
 class Register(Resource):
+    def __init__(self):
+        self.reqparse = _construct_reqparse()
+        super(Register, self).__init__()
+
     def post(self):
-        data = request.get_json()
-        if not is_valid(data):
-            return {'error': 'invalid data format'}, ResponseCodes.BAD_REQUEST_400
+        data = self.reqparse.parse_args()
 
         users_found = User.query.filter_by(username=data['username']).count()
         if users_found > 0:
@@ -59,7 +59,7 @@ class Register(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return {'message': 'user successfully created'}, ResponseCodes.OK
+        return {'detail': 'user successfully created'}, ResponseCodes.OK
 
 
 @login_manager.user_loader
