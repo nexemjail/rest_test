@@ -50,10 +50,12 @@ class UserLogoutAPIView(generics.RetrieveAPIView):
 class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
     permission_classes = [permissions.AllowAny]
+    lookup_field = 'username'
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
+            # seems strange
             if User.objects.filter(username=serializer.validated_data['username']).exists():
                 return response.Response({'detail': 'user already exists'}, status.HTTP_409_CONFLICT)
             self.perform_create(serializer)

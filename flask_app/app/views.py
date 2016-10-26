@@ -34,7 +34,7 @@ class Login(Resource):
         user = User.query.filter_by(username=data['username'],
                                     password=data['password']).first()
         if not user:
-            return {'error': 'invalid credentials'}, ResponseCodes.BAD_REQUEST_400
+            return {'error': 'invalid credentials'}, ResponseCodes.UNPROCESSABLE_ENTITY_422
 
         if not flask_login.login_user(user):
             return {'error': 'error while logging in'}, ResponseCodes.SERVER_ERROR_500
@@ -69,12 +69,12 @@ def load_user(user_id):
 
 class UserList(Resource):
     @flask_login.login_required
-    def get(self, id):
-        user = User.query.filter_by(id=id).first_or_404()
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first_or_404()
         return {'user': str(user)}, ResponseCodes.OK
 
 
 api.add_resource(Register, '/register/')
 api.add_resource(Login, '/login/')
 api.add_resource(Logout, '/logout/')
-api.add_resource(UserList, '/<int:id>/')
+api.add_resource(UserList, '/<int:user_id>/')
