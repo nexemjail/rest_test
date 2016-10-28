@@ -40,15 +40,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
     # override create cause of extra unnecessary fields
     # or just return necessary from validate method? ( bad idea)
     def create(self, validated_data):
-        password = validated_data['password']
-        first_name = validated_data['first_name']
-        last_name = validated_data['last_name']
-        email = validated_data['email']
-        username = validated_data['username']
-
-        return User.objects.create_user(username=username, email=email,
-                                        first_name=first_name, last_name=last_name,
-                                        password=password)
+        return User.objects.create_user(username=validated_data['username'],
+                                        email=validated_data['email'],
+                                        first_name=validated_data['first_name'],
+                                        last_name=validated_data['last_name'],
+                                        password=validated_data['password'])
 
 
 class UserLoginSerializer(serializers.ModelSerializer):

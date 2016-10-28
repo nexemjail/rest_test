@@ -30,12 +30,12 @@ class UserLoginAPIView(views.APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = authenticate(username=request.data['username'],
-                                password=request.data['password'])
+            user = authenticate(username=serializer.validated_data['username'],
+                                password=serializer.validated_data['password'])
             if user:
                 login(request, user)
                 return response.Response({'detail': 'login successful'}, status.HTTP_200_OK)
-            return response.Response({'detail': 'user not exist or invalid credentials'}, status.HTTP_401_UNAUTHORIZED)
+            return response.Response({'detail': 'user not exist or invalid credentials'}, status.HTTP_403_FORBIDDEN)
         return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 

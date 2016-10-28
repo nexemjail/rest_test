@@ -16,7 +16,7 @@ api_patterns = [
 ]
 
 urlpatterns = [
-    url(r'^api-token/$', obtain_auth_token),
+    # url(r'^api-token/$', obtain_auth_token),
     url(r'^auth/', include(urls, namespace='rest_framework')),
     url(r'^', include(api_patterns)),
 

@@ -1,7 +1,8 @@
-from flask import Flask
-from flask_restful import Resource, Api
-from flask.ext.sqlalchemy import SQLAlchemy
 import flask_login
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask_restful import Api
+
 import config
 
 app = Flask(__name__)
